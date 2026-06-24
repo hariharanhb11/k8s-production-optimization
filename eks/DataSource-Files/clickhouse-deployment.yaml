@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clickhouse
+  namespace: ensemble
+spec:
+  replicas: 1 # UAT-safe replica (can scale via HPA later)
+  selector:
+    matchLabels:
+      app: clickhouse
+  template:
+    metadata:
+      labels:
+        app: clickhouse
+    spec:
+      containers:
+        - name: clickhouse
+          image: yandex/clickhouse-server:21.11.10.1
+
+          ports:
+            - containerPort: 8123
+
+          # ✅ RESOURCE OPTIMIZATION (prevents overuse & improves scheduling)
+          resources:
+            requests:
+              cpu: "250m"   # reserved baseline CPU
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+
+          env:
+            - name: CLICKHOUSE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: clickhouse-secret
+                  key: CLICK_USER
+
+            - name: CLICKHOUSE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: clickhouse-secret
+                  key: CLICK_PASS
+
+            - name: CLICKHOUSE_DB
+              valueFrom:
+                secretKeyRef:
+                  name: clickhouse-secret
+                  key: CLICK_DB
+
+            - name: CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT
+              value: "1"
+
+          # ⚠️ HEALTH CHECKS ADDED FOR SELF-HEALING
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8123
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8123
+            initialDelaySeconds: 15
+            periodSeconds: 5
+
+          volumeMounts:
+            - name: clickhouse-db
+              mountPath: /var/lib/clickhouse
+
+            - name: clickhouse-logs
+              mountPath: /var/log/clickhouse-server
+
+            - name: clickhouse-config
+              mountPath: /etc/clickhouse-server/users.d/custom_settings.xml
+              subPath: custom_settings.xml
+
+      volumes:
+        # ⚠️ FIX: emptyDir removed → replaced with PVC for persistence
+        - name: clickhouse-db
+          persistentVolumeClaim:
+            claimName: shared-pvc
+
+        - name: clickhouse-logs
+          emptyDir: {} # logs can remain ephemeral
+
+        - name: clickhouse-config
+          configMap:
+            name: clickhouse-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: clickhouse
+  namespace: ensemble
+spec:
+  ports:
+    - port: 8123
+      targetPort: 8123
+  selector:
+    app: clickhouse

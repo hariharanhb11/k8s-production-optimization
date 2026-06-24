@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-eap
+  namespace: ensemble
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-eap
+  template:
+    metadata:
+      labels:
+        app: postgres-eap
+    spec:
+      securityContext:
+        fsGroup: 999
+
+      containers:
+      - name: postgres
+        image: postgres:13.3
+
+        ports:
+        - containerPort: 5432
+
+        # ✅ RESOURCE OPTIMIZATION
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASS
+
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_DB
+
+        # ⚠️ HEALTH CHECKS
+        livenessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 30
+          periodSeconds: 10
+
+        readinessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 15
+          periodSeconds: 5
+
+        volumeMounts:
+        - name: shared-storage
+          mountPath: /var/lib/postgresql/data
+          subPath: postgres
+
+        args:
+        - "-c"
+        - "max_connections=300"  # OPTIMIZED (reduced from 500 for stability)
+
+      volumes:
+      - name: shared-storage
+        persistentVolumeClaim:
+          claimName: shared-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-eap
+  namespace: ensemble
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: postgres-eap
