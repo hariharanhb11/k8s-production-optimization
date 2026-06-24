@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-eap
+  namespace: ensemble
+spec:
+  replicas: 1
+
+  #  Optimization: Add rollout strategy for safer deployments
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+
+  selector:
+    matchLabels:
+      app: rabbitmq-eap
+
+  template:
+    metadata:
+      labels:
+        app: rabbitmq-eap
+
+    spec:
+      securityContext:
+        fsGroup: 999
+
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:management
+
+        ports:
+        - containerPort: 5672
+        - containerPort: 15672
+
+        env:
+        - name: RABBITMQ_DEFAULT_USER
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: RABBITMQ_DEFAULT_USER
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: RABBITMQ_DEFAULT_PASS
+
+        volumeMounts:
+        - name: shared-storage
+          mountPath: /var/lib/rabbitmq
+          subPath: rabbitmq
+
+        #  Optimization: Startup probe prevents false failures during cold start
+        startupProbe:
+          exec:
+            command: ["rabbitmq-diagnostics", "check_port_connectivity"]
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          failureThreshold: 10
+
+        #  Optimization: Proper health check tuning
+        livenessProbe:
+          exec:
+            command: ["rabbitmq-diagnostics", "check_port_connectivity"]
+          initialDelaySeconds: 40
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+
+        readinessProbe:
+          exec:
+            command: ["rabbitmq-diagnostics", "check_port_connectivity"]
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          timeoutSeconds: 10
+          failureThreshold: 5
+
+        #  Optimization: Resource limits added (critical missing item)
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+
+      volumes:
+      - name: shared-storage
+        persistentVolumeClaim:
+          claimName: shared-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-eap
+  namespace: ensemble
+spec:
+  ports:
+  - name: amqp
+    port: 5672
+    targetPort: 5672
+  - name: management
+    port: 15672
+    targetPort: 15672
+  selector:
+    app: rabbitmq-eap

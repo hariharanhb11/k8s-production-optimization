@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+  namespace: ensemble
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush         5
+        Log_Level     info
+
+        #  Optimization: prevents memory spikes in production
+        Mem_Buf_Limit  50MB
+        storage.sync   normal
+
+    [INPUT]
+        Name              tail
+        Path              /var/log/containers/*.log
+        Parser            docker
+        Tag               kube.*
+        Refresh_Interval  5
+        Mem_Buf_Limit     10MB
+        Skip_Long_Lines   On
+
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Kube_URL            https://kubernetes.default.svc.cluster.local
+
+        #  Optimization: improves structured logging for debugging
+        Merge_Log           On
+        Keep_Log            Off
+        Labels              On
+        Annotations         Off
+
+    [OUTPUT]
+        Name  cloudwatch
+        Match *
+
+        region ap-south-1
+
+        #  Optimization: better log grouping strategy
+        log_group_name /aws/eks/ensemble-dev
+        log_stream_prefix from-fluent-bit-
+
+        auto_create_group true
+
+  parsers.conf: |
+    [PARSER]
+        Name   docker
+        Format json
+        Time_Key time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L  

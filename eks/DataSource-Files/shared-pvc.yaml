@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: shared-pvc
+
+  #  Optimization: namespace explicitly defined for multi-env isolation
+  namespace: ensemble
+
+  #  Optimization: labels for observability and tracking
+  labels:
+    app: shared-storage
+    environment: production
+
+spec:
+  accessModes:
+    #  Optimization: ensures multi-pod access across nodes (EFS requirement)
+    - ReadWriteMany
+
+  resources:
+    requests:
+      #  Optimization: logical request only (EFS is elastic, not disk-bound)
+      storage: 100Gi
+
+  storageClassName: efs-storage
+
+  #  Optimization: volume binding mode awareness (ensures proper dynamic binding)
+  volumeName: shared-pv

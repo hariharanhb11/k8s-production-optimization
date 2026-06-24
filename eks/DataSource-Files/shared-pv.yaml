@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: shared-pv
+
+  #  Optimization: label added for better identification & future automation
+  labels:
+    app: shared-storage
+    tier: backend
+
+spec:
+  capacity:
+    storage: 100Gi
+
+  volumeMode: Filesystem
+
+  accessModes:
+    #  Optimization: RWX retained for multi-pod access across nodes (EFS use case)
+    - ReadWriteMany
+
+  #  Optimization: safer retention policy for production data safety
+  persistentVolumeReclaimPolicy: Retain
+
+  storageClassName: efs-storage
+
+  csi:
+    driver: efs.csi.aws.com
+
+    #  Optimization: parameterized note added for clarity (important for ops teams)
+    volumeHandle: fs-0b6bf68eb94774c63  # EFS File System ID (shared persistent storage)
