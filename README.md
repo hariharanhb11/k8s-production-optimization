@@ -1,30 +1,43 @@
-Kubernetes Production Optimization Project
-Overview
+# Kubernetes Production Optimization Project
 
-This project demonstrates Kubernetes production optimization across a multi-environment setup using AWS EKS and Terraform. The focus is on improving resource utilization, application reliability, scalability, and infrastructure consistency by applying Kubernetes best practices.
+## Overview
 
-The repository contains optimized Kubernetes manifests and infrastructure configurations for both Production and UAT environments.
+This project demonstrates Kubernetes production optimization across a multi-environment setup using **AWS EKS** and **Terraform**. The primary focus is on improving resource utilization, application reliability, scalability, and infrastructure consistency by applying Kubernetes best practices.
 
-Project Scope
-Production-like Kubernetes environment (eks/)
-UAT / Testing environment (eks_uat/)
-Stateful databases:
-PostgreSQL
-MongoDB
-ClickHouse
-Infrastructure as Code using Terraform
-Observability using Fluent Bit
-Objectives
+The repository contains optimized Kubernetes manifests and infrastructure configurations for both **Production** and **UAT** environments.
+
+---
+
+## Project Scope
+
+* **Production-like Kubernetes environment:** `eks/`
+* **UAT / Testing environment:** `eks_uat/`
+* **Stateful databases:**
+
+  * PostgreSQL
+  * MongoDB
+  * ClickHouse
+* **Infrastructure as Code:** Terraform
+* **Observability:** Fluent Bit
+
+---
+
+# Objectives
 
 The primary objectives of this project are:
 
-Optimize Kubernetes resource utilization
-Implement production-grade health checks
-Improve reliability of stateful workloads
-Apply Infrastructure as Code (Terraform) best practices
-Separate Production and UAT environments
-Improve cost efficiency and scalability readiness
-Repository Structure
+* Optimize Kubernetes resource utilization
+* Implement production-grade health checks
+* Improve reliability of stateful workloads
+* Apply Infrastructure as Code (Terraform) best practices
+* Maintain separate Production and UAT environments
+* Improve cost efficiency and scalability readiness
+
+---
+
+# Repository Structure
+
+```text
 kubernetes-production-optimization/
 │
 ├── README.md
@@ -50,168 +63,248 @@ kubernetes-production-optimization/
 │
 └── reports/
     └── optimization-report.md
-Problem Statement
+```
+
+---
+
+# Problem Statement
 
 The existing Kubernetes deployment required improvements in resource management, reliability, storage configuration, and infrastructure organization.
 
-Resource Management
-CPU requests and limits were not defined
-Memory requests and limits were not defined
-Resource allocation could lead to over-provisioning
-Reliability
-Liveness probes were missing
-Readiness probes were missing
-No automated self-healing validation
-Storage
-Ephemeral storage was used for stateful workloads
-Potential risk of data loss
-Infrastructure
-Terraform configuration required optimization
-Production and UAT environments needed better separation
-Cost optimization opportunities were identified
-Optimization Approach
-1. Workload Analysis
+## Resource Management
 
-Reviewed each Kubernetes deployment to understand:
+* CPU requests were not defined
+* CPU limits were not defined
+* Memory requests were not defined
+* Memory limits were not defined
+* Resource allocation could lead to over-provisioning
 
-CPU utilization
-Memory consumption
-Database workload behavior
-Stateful application requirements
-2. Resource Optimization
+## Reliability
 
-Implemented:
+* Liveness probes were missing
+* Readiness probes were missing
+* No automated self-healing validation
 
-CPU Requests
-CPU Limits
-Memory Requests
-Memory Limits
-Benefits
-Better pod scheduling
-Controlled resource allocation
-Reduced resource waste
-Improved cluster efficiency
-3. Health Check Implementation
+## Storage
 
-Configured:
+* Ephemeral storage was used for stateful workloads
+* Potential risk of data loss
 
-Liveness Probes
-Readiness Probes
-Benefits
-Automatic pod recovery
-Improved application availability
-Traffic routed only to healthy pods
-4. Storage Optimization
+## Infrastructure
 
-Reviewed storage configuration and introduced persistent storage patterns for stateful applications.
+* Terraform configuration required optimization
+* Production and UAT environments needed better separation
+* Cost optimization opportunities were identified
 
-Benefits
-Improved data persistence
-Better workload reliability
-Production-ready storage configuration
-5. Database Optimization
-PostgreSQL
-Resource optimization
-Connection stability improvements
-MongoDB
-Resource allocation improvements
-Health check implementation
-ClickHouse
-Storage configuration review
-Performance-focused resource optimization
-6. Environment Strategy
-Production Environment (eks/)
-Stable configuration
-Balanced resource allocation
-Production-focused deployment
-UAT Environment (eks_uat/)
-Cost-optimized configuration
-Deployment automation
-Environment cleanup automation
-Validation and testing environment
-Expected Outcomes
+---
+
+# Optimization Approach
+
+## 1. Workload Analysis
+
+Each Kubernetes deployment was reviewed to understand:
+
+* CPU utilization
+* Memory consumption
+* Database workload behavior
+* Stateful application requirements
+
+---
+
+## 2. Resource Optimization
+
+### Implemented
+
+* CPU Requests
+* CPU Limits
+* Memory Requests
+* Memory Limits
+
+### Benefits
+
+* Better pod scheduling
+* Controlled resource allocation
+* Reduced resource waste
+* Improved cluster efficiency
+
+---
+
+## 3. Health Check Implementation
+
+### Configured
+
+* Liveness Probes
+* Readiness Probes
+
+### Benefits
+
+* Automatic pod recovery
+* Improved application availability
+* Traffic routed only to healthy pods
+
+---
+
+## 4. Storage Optimization
+
+Storage configuration was reviewed and persistent storage patterns were introduced for stateful applications.
+
+### Benefits
+
+* Improved data persistence
+* Better workload reliability
+* Production-ready storage configuration
+
+---
+
+## 5. Database Optimization
+
+### PostgreSQL
+
+* Resource optimization
+* Connection stability improvements
+
+### MongoDB
+
+* Resource allocation improvements
+* Health check implementation
+
+### ClickHouse
+
+* Storage configuration review
+* Performance-focused resource optimization
+
+---
+
+## 6. Environment Strategy
+
+### Production Environment (`eks/`)
+
+* Stable configuration
+* Balanced resource allocation
+* Production-focused deployment
+
+### UAT Environment (`eks_uat/`)
+
+* Cost-optimized configuration
+* Deployment automation
+* Environment cleanup automation
+* Validation and testing environment
+
+---
+
+# Expected Outcomes
 
 The applied optimizations are expected to provide:
 
-Improved resource utilization
-Reduced infrastructure cost
-Faster recovery from application failures
-Improved workload stability
-Better scalability readiness
-Key Technologies
-Technology	Purpose
-Kubernetes (AWS EKS)	Container orchestration
-Terraform	Infrastructure as Code
-PostgreSQL	Relational database
-MongoDB	NoSQL database
-ClickHouse	Analytical database
-Fluent Bit	Logging and observability
-AWS IAM (aws-auth)	Authentication and access control
-Kubernetes Probes	Application health monitoring
-Persistent Volumes (PV/PVC)	Stateful storage
-Deployment Reference
+* Improved resource utilization
+* Reduced infrastructure cost
+* Faster recovery from application failures
+* Improved workload stability
+* Better scalability readiness
+
+---
+
+# Key Technologies
+
+| Technology                  | Purpose                           |
+| --------------------------- | --------------------------------- |
+| Kubernetes (AWS EKS)        | Container orchestration           |
+| Terraform                   | Infrastructure as Code            |
+| PostgreSQL                  | Relational database               |
+| MongoDB                     | NoSQL database                    |
+| ClickHouse                  | Analytical database               |
+| Fluent Bit                  | Logging and observability         |
+| AWS IAM (`aws-auth`)        | Authentication and access control |
+| Kubernetes Probes           | Application health monitoring     |
+| Persistent Volumes (PV/PVC) | Stateful storage                  |
+
+---
+
+# Deployment Reference
+
+```bash
 kubectl apply -f eks/DataSource\ Files/clickhouse-deployment.yaml
 
 kubectl apply -f eks/DataSource\ Files/mongodb-deployment.yaml
 
 kubectl apply -f eks/DataSource\ Files/postgres-deployment.yaml
-Before vs After Optimization
-Feature	Before	After
-Resource Limits	Not Defined	Implemented
-Resource Requests	Not Defined	Implemented
-Health Checks	Not Present	Implemented
-Storage Strategy	Ephemeral	Persistent
-Cost Efficiency	Limited	Optimized
-Application Stability	Moderate	Improved
-Architecture Summary
-                 Terraform
-                      │
-                      │
-              AWS EKS Cluster
-                      │
-        ┌─────────────┴─────────────┐
-        │                           │
-        │                           │
- Production Environment      UAT Environment
-       (eks/)                 (eks_uat/)
-        │                           │
-        │                           │
+```
+
+---
+
+# Before vs After Optimization
+
+| Feature               | Before      | After       |
+| --------------------- | ----------- | ----------- |
+| Resource Limits       | Not Defined | Implemented |
+| Resource Requests     | Not Defined | Implemented |
+| Health Checks         | Not Present | Implemented |
+| Storage Strategy      | Ephemeral   | Persistent  |
+| Cost Efficiency       | Limited     | Optimized   |
+| Application Stability | Moderate    | Improved    |
+
+---
+
+# Architecture Summary
+
+```text
+                    Terraform
+                        │
+                        │
+                AWS EKS Cluster
+                        │
+        ┌───────────────┴───────────────┐
+        │                               │
+        │                               │
+ Production Environment          UAT Environment
+          (eks/)                    (eks_uat/)
+        │        │        │               │
+        │        │        │               │
  PostgreSQL  MongoDB  ClickHouse   Application Config
-        │                           │
-        └───────────┬───────────────┘
-                    │
-               Fluent Bit
-                    │
+        │
+        └───────────────┬────────────────┘
+                        │
+                   Fluent Bit
+                        │
              Cluster Observability
-Key Learnings
+```
+
+---
+
+# Key Learnings
 
 This project demonstrates practical implementation of:
 
-Kubernetes production readiness
-Resource optimization techniques
-Infrastructure as Code using Terraform
-Multi-environment deployment strategy
-Stateful workload management
-Kubernetes health monitoring
-Production-focused DevOps best practices
-Demo Flow
+* Kubernetes production readiness
+* Resource optimization techniques
+* Infrastructure as Code using Terraform
+* Multi-environment deployment strategy
+* Stateful workload management
+* Kubernetes health monitoring
+* Production-focused DevOps best practices
 
-During the presentation, follow this sequence:
+---
 
-Project Overview
-Objectives
-Repository Structure
-Problem Statement
-Optimization Approach
-Before vs After Comparison
-Architecture Summary
-Expected Outcomes
-Key Learnings
+# Demo Flow
 
-This flow provides a clear and professional explanation of the project from start to finish.
+Use the following sequence during project presentation:
 
-Author
+1. Project Overview
+2. Objectives
+3. Repository Structure
+4. Problem Statement
+5. Optimization Approach
+6. Before vs After Comparison
+7. Architecture Summary
+8. Expected Outcomes
+9. Key Learnings
 
-Kubernetes Production Optimization Project
+This flow provides a clear and structured explanation of the project from start to finish.
 
-A DevOps project demonstrating Kubernetes workload optimization, Infrastructure as Code, multi-environment architecture, and production best practices using AWS EKS and Terraform.
+---
+
+# Author
+
+**Kubernetes Production Optimization Project**
+
+*A DevOps project demonstrating Kubernetes workload optimization, Infrastructure as Code, multi-environment architecture, and production best practices using AWS EKS and Terraform.*
